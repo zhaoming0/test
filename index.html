@@ -1,98 +1,107 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-<title>Generic Sensor IDL tests</title>
-<link rel="author" title="Tobie Langel" href="http://www.codespeaks.com">
-<link rel="help" href="http://www.w3.org/TR/generic-sensor/">
-<script src="./resources/testharness.js"></script>
-<script src="./resources/testharnessreport.js"></script>
-<script src="./resources/WebIDLParser.js"></script>
-<script src="./resources/idlharness.js"></script>
-<style>
-  pre {
-    display: none;
-  }
-</style>
-<div id="log"></div>
+<!doctype html>
+<html>
+<head>
+<meta charset=utf-8>
+<title>IDL check of RTCPeerConnection</title>
+<link rel="author" title="Harald Alvestrand" href="mailto:hta@google.com"/>
+<link rel="help" href="http://w3c.github.io/webrtc-pc/#rtcpeerconnection-interface">
+</head>
+<body>
 
-<pre id="idl">
-enum NFCRecordType {
-    "empty",
-    "text",
-    "url",
-    "json",
-    "opaque"
+<h1 class="instructions">Description</h1>
+<p class="instructions">This test verifies the availability of the RTCPeerConnection interface.</p>
+<div id='log'></div>
+<script src=./resources/testharness.js></script>
+<script src=./resources/testharnessreport.js></script>
+<script src=./resources/WebIDLParser.js></script>
+<script src=./resources/idlharness.js></script>
+
+<!-- The IDL is copied from the 22 September 2015 editors' draft. -->
+<script type="text/plain">
+interface EventTarget {
+    // Only a dummy definition is needed here.
+};
+[ Constructor (optional RTCConfiguration configuration)]
+interface RTCPeerConnection : EventTarget  {
+    Promise<RTCSessionDescription> createOffer (optional RTCOfferOptions options);
+    Promise<RTCSessionDescription> createAnswer (optional RTCAnswerOptions options);
+    Promise<void>                  setLocalDescription (RTCSessionDescription description);
+    readonly    attribute RTCSessionDescription? localDescription;
+    readonly    attribute RTCSessionDescription? currentLocalDescription;
+    readonly    attribute RTCSessionDescription? pendingLocalDescription;
+    Promise<void>                  setRemoteDescription (RTCSessionDescription description);
+    readonly    attribute RTCSessionDescription? remoteDescription;
+    readonly    attribute RTCSessionDescription? currentRemoteDescription;
+    readonly    attribute RTCSessionDescription? pendingRemoteDescription;
+    Promise<void>                  addIceCandidate (RTCIceCandidate candidate);
+    readonly    attribute RTCSignalingState      signalingState;
+    readonly    attribute RTCIceGatheringState   iceGatheringState;
+    readonly    attribute RTCIceConnectionState  iceConnectionState;
+    readonly    attribute boolean?               canTrickleIceCandidates;
+    RTCConfiguration               getConfiguration ();
+    void                           setConfiguration (RTCConfiguration configuration);
+    void                           close ();
+                attribute EventHandler           onnegotiationneeded;
+                attribute EventHandler           onicecandidate;
+                attribute EventHandler           onsignalingstatechange;
+                attribute EventHandler           oniceconnectionstatechange;
+                attribute EventHandler           onicegatheringstatechange;
 };
 
-typedef (DOMString or unrestricted double or ArrayBuffer or Dictionary) NFCRecordData;
-
-dictionary NFCRecord {
-    NFCRecordType recordType;
-    USVString     mediaType;
-    NFCRecordData data;
-};
-dictionary NFCMessage {
-    sequence<NFCRecord> data;
-    USVString           url;
-};
-partial interface Navigator {
-    readonly attribute NFC nfc;
-};
-typedef (DOMString or ArrayBuffer or NFCMessage) NFCPushMessage;
-
-interface NFC {
-    Promise<void> push(NFCPushMessage message, optional NFCPushOptions options);
-    Promise<void> cancelPush(optional NFCPushTarget target = "any");
-    Promise<long> watch(MessageCallback callback,
-                        optional NFCWatchOptions options);
-    Promise<void> cancelWatch(optional long id);
+partial interface RTCPeerConnection {
+    void createOffer (RTCSessionDescriptionCallback successCallback, RTCPeerConnectionErrorCallback failureCallback, optional RTCOfferOptions options);
+    void setLocalDescription (RTCSessionDescription description, VoidFunction successCallback, RTCPeerConnectionErrorCallback failureCallback);
+    void createAnswer (RTCSessionDescriptionCallback successCallback, RTCPeerConnectionErrorCallback failureCallback);
+    void setRemoteDescription (RTCSessionDescription description, VoidFunction successCallback, RTCPeerConnectionErrorCallback failureCallback);
+    void addIceCandidate (RTCIceCandidate candidate, VoidFunction successCallback, RTCPeerConnectionErrorCallback failureCallback);
+    void getStats (MediaStreamTrack? selector, RTCStatsCallback successCallback, RTCPeerConnectionErrorCallback failureCallback);
 };
 
-callback MessageCallback = void (NFCMessage message);
-enum NFCPushTarget {
-    "tag",
-    "peer",
-    "any"
+partial interface RTCPeerConnection {
+    static Promise<RTCCertificate> generateCertificate (AlgorithmIdentifier keygenAlgorithm);
 };
 
-dictionary NFCPushOptions {
-    NFCPushTarget       target = "any";
-    unrestricted double timeout = Infinity;
-    boolean             ignoreRead = true;
-};
-enum NFCWatchMode {
-    "web-nfc-only",
-    "any"
+partial interface RTCPeerConnection {
+    sequence<RTCRtpSender>   getSenders ();
+    sequence<RTCRtpReceiver> getReceivers ();
+    RTCRtpSender             addTrack (MediaStreamTrack track, MediaStream... streams);
+    void                     removeTrack (RTCRtpSender sender);
+                attribute EventHandler ontrack;
 };
 
-dictionary NFCWatchOptions {
-    USVString      url = "";
-    NFCRecordType? recordType;
-    USVString      mediaType = "";
-    NFCWatchMode   mode = "web-nfc-only";
+partial interface RTCPeerConnection {
+    RTCDataChannel createDataChannel ([TreatNullAs=EmptyString] DOMString label, optional RTCDataChannelInit dataChannelDict);
+                attribute EventHandler ondatachannel;
 };
 
-</pre>
-
-<pre id="generic-idl">
-[Constructor(DOMString type, SensorErrorEventInit errorEventInitDict)]
-interface SensorErrorEvent : Event {
-  readonly attribute Error error;
+partial interface RTCPeerConnection {
+    readonly    attribute RTCDTMFSender? dtmf;
 };
 
-dictionary SensorErrorEventInit : EventInit {
-  Error error;
+partial interface RTCPeerConnection {
+    Promise<RTCStatsReport> getStats (optional MediaStreamTrack? selector);
 };
-</pre>
 
+partial interface RTCPeerConnection {
+    void               setIdentityProvider (DOMString provider, optional DOMString protocol, optional DOMString usernameHint);
+    Promise<DOMString> getIdentityAssertion ();
+    readonly    attribute Promise<RTCIdentityAssertion> peerIdentity;
+    readonly    attribute DOMString?                    idpLoginUrl;
+};
+
+</script>
 <script>
 (function() {
-  "use strict";
   var idl_array = new IdlArray();
-  idl_array.add_untested_idls(document.getElementById('idl').textContent);
-  idl_array.add_idls(document.getElementById('generic-idl').textContent);
-  idl_array.add_objects({
-    SensorErrorEvent: ['new SensorErrorEvent({ error: new TypeError("Boom!") });']
-  });
+  [].forEach.call(document.querySelectorAll("script[type=text\\/plain]"),
+                  function(node) {
+                    idl_array.add_idls(node.textContent);
+                  });
+  window.pc = new RTCPeerConnection(null);
+  idl_array.add_objects({"RTCPeerConnection": ["pc"]});
   idl_array.test();
+  done();
 })();
 </script>
+</body>
+</html>
