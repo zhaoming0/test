@@ -14,7 +14,7 @@ test(function() {
 test(function() {
   ['cancelPush', 'push', 'watch', 'cancelWatch']
     .forEach((method) => {
-      assert_true(method in navigator.nfc)
+      assert_true(method in navigator.nfc);
     })
 }, "Make sure methods are all there.")
 
