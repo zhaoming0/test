@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<script src="../resources/testharness.js"></script>
+<script src="../resources/testharnessreport.js"></script>
+<script>
+test(function() {
+  assert_throws(null, function() {
+    new NFC();
+  }, "the constructor should not be callable with 'new'");
+  assert_throws(null, function() {
+    NFC();
+  }, "the constructor should not be callable");
+}, "Make sure constructor call type.");
+
+test(function() {
+  ['cancelPush', 'push', 'watch', 'cancelWatch']
+    .forEach((method) => {
+      assert_true(method in navigator.nfc)
+    })
+}, "Make sure methods are all there.")
+
+test(function() {
+  assert_true(navigator.nfc instanceof Object, 'navigator.nfc exists.');
+  assert_true('nfc' in navigator, 'navigator.nfc exists.');
+}, "Make sure 'navigator.nfc' exists and type is correct.");
+
+//watch
+promise_test(t => {
+  return navigator.nfc.watch(function() {}).then(result => {
+    console.log(result);
+  }).catch((err) => {
+    console.log(err);
+  })
+}, "Test that nfc watch success if NFC HW is enable.")
+
+</script>
+
