@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <title>Primary test context</title>
+  <head>
+    <script src="./resources/testharness.js"></script>
+    <script src="./resources/testharnessreport.js"></script>
+  </head>
+  <body>
+    <div id="log"></div>
+    <script>
+      const child_window = window.open("index.html");
+      fetch_tests_from_window(child_window);
+    </script>
+  </body>
+</html>
