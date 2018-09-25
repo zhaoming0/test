@@ -16,6 +16,6 @@ const driver = builder.build();
 (async () => {
     await driver.get("https://www.google.com");
     await driver.wait(until.titleIs("Google"));
-    const login = await driver.findElement(By.id("hplogo"));
+    const login = await driver.findElement(By.id("iashplogo"));
     await login.click();
 })();
