@@ -14,8 +14,8 @@ builder.setChromeOptions(options);
 
 const driver = builder.build();
 (async () => {
-    await driver.get("https://tweetdeck.twitter.com");
-    await driver.wait(until.titleIs("TweetDeck"));
-    const login = await driver.findElement(By.css("form.form-login a.btn"));
+    await driver.get("https://www.google.com");
+    await driver.wait(until.titleIs("Google"));
+    const login = await driver.findElement(By.id("hplogo"));
     await login.click();
 })();
