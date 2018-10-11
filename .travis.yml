@@ -16,6 +16,7 @@ matrix:
     - os: osx
       node_js: '7'
       sudo: required
+      env: DISPLAY=':99.0'
       env: HOMEBREW_CASK_OPTS='--appdir=/Applications'
 
 before_install:
