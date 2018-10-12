@@ -13,11 +13,6 @@ matrix:
             - google-chrome
           packages:
             - google-chrome-stable
-    - os: osx
-      node_js: '7'
-      sudo: required
-      env: DISPLAY=':99.0'
-
 before_install:
   - |
     if [ "$TRAVIS_OS_NAME" = "osx" ]; then
