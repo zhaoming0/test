@@ -4,6 +4,7 @@ const chrome = require("selenium-webdriver/chrome");
 const chromedriver = require("chromedriver");
 
 const csv = require("fast-csv");
+const os = require("os");
 
 const until = webdriver.until;
 
@@ -16,6 +17,7 @@ builder.setChromeOptions(options);
 
 let testlink = path.join("file:\/\/", __dirname, "test", "index-local.html")
 
+console.log(os.type())
 const driver = builder.build();
 (async () => {
     // await driver.get("https://www.google.com");
