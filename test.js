@@ -257,5 +257,6 @@ var csvSuite = "tests";
 })().then(function() {
     console.log("Grasping test result is completed!");
 }).catch(function(err) {
-    throw err;
+    console.log(err);
+    process.exit(1);
 });
