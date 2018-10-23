@@ -211,7 +211,7 @@ var csvSuite = "tests";
             "Linux-WebGL2"
         ];
         let backends = [
-            "WebGL2",
+            // "WebGL2",
             "WASM"
         ]
         for (let j of backends) {
@@ -254,5 +254,6 @@ var csvSuite = "tests";
 })().then(function() {
     console.log("Grasping test result is completed!");
 }).catch(function(err) {
+    process.exit(1);
     throw err;
 });
