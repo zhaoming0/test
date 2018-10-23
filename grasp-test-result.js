@@ -218,6 +218,7 @@ var csvSuite = "tests";
             let totalResult
             for (let i of backendModels) {
                 if ((i.indexOf(platform) != -1) && (i.indexOf(j) != -1)) {
+                    console.log("Begin test with : " + i + " backend.");
                     totalResult = baselinejson[i]
                     let testlink = path.join("file:\/\/", __dirname, "test", "index-local.html?backend=");
                     await driver.get(testlink + j.toLowerCase());
