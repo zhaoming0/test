@@ -211,7 +211,7 @@ var csvSuite = "tests";
             "Linux-WebGL2"
         ];
         let backends = [
-            // "WebGL2",
+            "WebGL2",
             "WASM"
         ]
         for (let j of backends) {
@@ -237,15 +237,12 @@ var csvSuite = "tests";
             if (totalResult.pass !== countPasses) {
                 let str = "Expect pass is : " + totalResult.pass + " and actual result is : " + countPasses + " not equal will exit !";
                 throw new Error(str);
-                process.exit(1);
             } else if (totalResult.fail !== countFailures) {
                 let str = "Expect fail is : " + totalResult.fail + " and actual result is : " + countFailures + " not equal will exit !";
                 throw new Error(str);
-                process.exit(1);
             } else if (totalResult.block !== countPending) {
                 let str = "Expect block is : " + totalResult.block + " and actual result is : " + countPending + " not equal will exit !";
                 throw new Error(str);
-                process.exit(1);
             } else {
                 let str = "Result match with baseline, test pass. " + "\n Pass : " + countPasses + "\n Fail : " + countFailures + "\n Block : " + countPending;
                 console.log(str);
