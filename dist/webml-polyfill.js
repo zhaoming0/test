@@ -951,9 +951,6 @@ var Tensor = function () {
 
       var shape = this.textureSliceShape;
       var numSlices = Math.ceil(this.textureShape[0] / _WebGL2.default.MAX_TEXTURE_SIZE);
-      if (numSlices > _WebGL2.default.MAX_TEXTURE_IMAGE_UNITS) {
-        throw new Error('[Tensor] numSlices ' + numSlices + ' > MAX_TEXTURE_IMAGE_UNITS ' + _WebGL2.default.MAX_TEXTURE_IMAGE_UNITS);
-      }
       var offset = 0;
 
       for (var k = 0; k < numSlices; k++) {
@@ -8016,8 +8013,6 @@ var _ndarrayOps2 = _interopRequireDefault(_ndarrayOps);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
@@ -8053,7 +8048,8 @@ var Model = function () {
 
       return new Promise(function (resolve) {
         if (_this.supportInputLayer) {
-          _this._layers.push(new _modelUtils.WebGL2SpecialLayers.Input());
+          var attrs = { inputsNum: _this._model._inputs.length };
+          _this._layers.push(new _modelUtils.WebGL2SpecialLayers.Input(attrs));
         }
         _this._model._operations.forEach(function (op, i) {
           // console.log(op);
@@ -8082,51 +8078,60 @@ var Model = function () {
   }, {
     key: 'execute',
     value: function execute(inputs, outputs) {
+      var _this2 = this;
+
       var inputShape = this._model._operands[inputs.get(0).index].dimensions;
       var outputShape = this._model._operands[outputs.get(0).index].dimensions;
       if (inputShape.length === 4) {
-        var inputIndex = 0;
-        var outputIndex = 0;
-        var inputSize = 0;
-        var outputSize = 0;
-        var inputBuffer = [];
-        var outputBuffer = [];
-        var tmpInputs = new Map();
-        var tmpOutputs = new Map();
-        var tmpBuffer = [];
-        var inputDim = [];
-        for (var i = 0; i < outputs.size; ++i) {
-          tmpBuffer[i] = [];
-        }
-        for (var _i = 0; _i < inputShape[0]; ++_i) {
-          for (var j = 0; j < inputs.size; ++j) {
-            inputDim = this._model._operands[inputs.get(j).index].dimensions;
-            inputSize = inputDim.slice(1).reduce(function (accumulator, currentValue) {
-              return accumulator * currentValue;
-            });
-            inputIndex = inputs.get(j).index;
-            inputBuffer = inputs.get(j).buffer;
-            tmpInputs.set(j, { index: inputIndex, buffer: inputBuffer.slice(inputSize * _i, inputSize * (_i + 1)) });
+        (function () {
+          var inputIndex = 0;
+          var outputIndex = 0;
+          var inputSize = 0;
+          var outputSize = 0;
+          var inputBuffer = [];
+          var outputBuffer = [];
+          var tmpInputs = new Map();
+          var tmpOutputs = new Map();
+          var tmpBuffer = [];
+          var inputDim = [];
+          for (var i = 0; i < outputs.size; ++i) {
+            tmpBuffer[i] = [];
           }
-          for (var _j = 0; _j < outputs.size; ++_j) {
-            outputShape = this._model._operands[outputs.get(_j).index].dimensions;
-            outputSize = outputShape.slice(1).reduce(function (accumulator, currentValue) {
-              return accumulator * currentValue;
-            });
-            outputIndex = outputs.get(_j).index;
-            outputBuffer = outputs.get(_j).buffer;
-            tmpOutputs.set(_j, { index: outputIndex, buffer: outputBuffer.slice(outputSize * _i, outputSize * (_i + 1)) });
-          }
-          this._execute(tmpInputs, tmpOutputs, _i);
-          for (var _j2 = 0; _j2 < outputs.size; ++_j2) {
-            var _tmpBuffer$_j;
+          for (var _i = 0; _i < inputShape[0]; ++_i) {
+            for (var j = 0; j < inputs.size; ++j) {
+              inputDim = _this2._model._operands[inputs.get(j).index].dimensions;
+              inputSize = inputDim.slice(1).reduce(function (accumulator, currentValue) {
+                return accumulator * currentValue;
+              });
+              inputIndex = inputs.get(j).index;
+              inputBuffer = inputs.get(j).buffer;
+              tmpInputs.set(j, { index: inputIndex, buffer: inputBuffer.slice(inputSize * _i, inputSize * (_i + 1)) });
+            }
+            for (var _j = 0; _j < outputs.size; ++_j) {
+              outputShape = _this2._model._operands[outputs.get(_j).index].dimensions;
+              outputSize = outputShape.slice(1).reduce(function (accumulator, currentValue) {
+                return accumulator * currentValue;
+              });
+              outputIndex = outputs.get(_j).index;
+              outputBuffer = outputs.get(_j).buffer;
+              tmpOutputs.set(_j, { index: outputIndex, buffer: outputBuffer.slice(outputSize * _i, outputSize * (_i + 1)) });
+            }
+            _this2._execute(tmpInputs, tmpOutputs, _i);
 
-            (_tmpBuffer$_j = tmpBuffer[_j2]).push.apply(_tmpBuffer$_j, _toConsumableArray(tmpOutputs.get(_j2).buffer));
+            var _loop = function _loop(_j2) {
+              tmpOutputs.get(_j2).buffer.forEach(function (a) {
+                return tmpBuffer[_j2].push(a);
+              });
+            };
+
+            for (var _j2 = 0; _j2 < outputs.size; ++_j2) {
+              _loop(_j2);
+            }
           }
-        }
-        for (var _j3 = 0; _j3 < outputs.size; ++_j3) {
-          outputs.get(_j3).buffer.set(tmpBuffer[_j3]);
-        }
+          for (var _j3 = 0; _j3 < outputs.size; ++_j3) {
+            outputs.get(_j3).buffer.set(tmpBuffer[_j3]);
+          }
+        })();
       } else {
         this._execute(inputs, outputs);
       }
@@ -8143,19 +8148,19 @@ var Model = function () {
   }, {
     key: '_execute',
     value: function _execute(inputs, outputs) {
-      var _this2 = this;
+      var _this3 = this;
 
       var num = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
 
       return new Promise(function (resolve) {
         var isLast = false;
-        var nnOperands = _this2._model._operands;
+        var nnOperands = _this3._model._operands;
         var inputBuffer = inputs.get(0).buffer;
         var inputIndex = inputs.get(0).index;
         var outputBuffer = outputs.get(0).buffer;
         var outputIndex = outputs.get(0).index;
         // let operationStart = performance.now();
-        _this2._layers.forEach(function (layer, i) {
+        _this3._layers.forEach(function (layer, i) {
           // let start = performance.now();
           if (i === 0) {
             var shape = nnOperands[inputIndex].dimensions;
@@ -8164,17 +8169,18 @@ var Model = function () {
             } else {
               shape = shape;
             }
-            if (_this2.supportInputLayer) {
-              inputs.forEach(function (input) {
-                _this2._operands[input.index] = layer.call(input.buffer, shape, Float32Array);
+            if (_this3.supportInputLayer) {
+              var inputTensors = layer.call(inputs, shape, Float32Array);
+              inputs.forEach(function (input, k) {
+                _this3._operands[input.index] = inputTensors[k];
               });
             } else {
               var inputTensor = new _Tensor2.default(inputBuffer, shape);
-              _this2._operands[layer.outputs[0]] = layer.call(inputTensor);
+              _this3._operands[layer.outputs[0]] = layer.call(inputTensor);
             }
-          } else if (i === _this2._layers.length - 1 && (_this2.supportTopClasses || _this2.supportFeatureMapConcate)) {
-            if (_this2.supportTopClasses) {
-              var outBufferAndIndex = layer.call(_this2._operands[outputIndex]);
+          } else if (i === _this3._layers.length - 1 && (_this3.supportTopClasses || _this3.supportFeatureMapConcate)) {
+            if (_this3.supportTopClasses) {
+              var outBufferAndIndex = layer.call(_this3._operands[outputIndex]);
               // console.log(`outBufferAndIndex: ${outBufferAndIndex}`);
               outputBuffer.fill(0);
               var bufferLength = outBufferAndIndex.length / 2;
@@ -8182,22 +8188,22 @@ var Model = function () {
                 outputBuffer[outBufferAndIndex[k + bufferLength]] = outBufferAndIndex[k];
               }
               // console.log(`outputBuffer: ${outputBuffer}`);
-            } else if (_this2.supportFeatureMapConcate) {
+            } else if (_this3.supportFeatureMapConcate) {
               var inputList = [];
               for (var _i2 = 0; _i2 < outputs.size; ++_i2) {
                 outputIndex = outputs.get(_i2).index;
-                inputList.push(_this2._operands[outputIndex]);
+                inputList.push(_this3._operands[outputIndex]);
               }
               layer.call(inputList, outputs);
             }
           } else {
             if (layer.inputs.length === 1) {
-              _this2._operands[layer.outputs[0]] = layer.call(_this2._operands[layer.inputs[0]]);
+              _this3._operands[layer.outputs[0]] = layer.call(_this3._operands[layer.inputs[0]]);
               isLast = true;
             } else {
               var MutiInputs = [];
               layer.inputs.forEach(function (input) {
-                if (!(_this2._operands[input] instanceof _Tensor2.default)) {
+                if (!(_this3._operands[input] instanceof _Tensor2.default)) {
                   var inputShape = nnOperands[input].dimensions;
                   if (inputShape.length === 4) {
                     inputShape = inputShape.slice(1, 4);
@@ -8207,39 +8213,39 @@ var Model = function () {
                   var inputSize = inputShape.reduce(function (accumulator, currentValue) {
                     return accumulator * currentValue;
                   });
-                  _this2._operands[input] = new _Tensor2.default(nnOperands[input].value.slice(inputSize * num, inputSize * (num + 1)), inputShape);
+                  _this3._operands[input] = new _Tensor2.default(nnOperands[input].value.slice(inputSize * num, inputSize * (num + 1)), inputShape);
                   if (typeof nnOperands[input].value[inputSize * (num + 1)] === "undefined") {
                     isLast = true;
                   }
                 }
-                if (!_this2._operands[input].texture && !_this2._operands[input].textureSlices) {
-                  if (_this2._operands[input].tensor.shape.length <= 2) {
-                    _this2._operands[input].createGLTexture({ type: '2d', format: 'float', supportSliceTexture: true });
-                  } else if (_this2._operands[input].tensor.shape.length > 2) {
-                    _this2._operands[input].reshapeTo2D();
-                    _this2._operands[input].createGLTexture({ type: '2d', format: 'float', supportSliceTexture: true });
+                if (!_this3._operands[input].texture && !_this3._operands[input].textureSlices) {
+                  if (_this3._operands[input].tensor.shape.length <= 2) {
+                    _this3._operands[input].createGLTexture({ type: '2d', format: 'float', supportSliceTexture: true });
+                  } else if (_this3._operands[input].tensor.shape.length > 2) {
+                    _this3._operands[input].reshapeTo2D();
+                    _this3._operands[input].createGLTexture({ type: '2d', format: 'float', supportSliceTexture: true });
                   }
                 }
-                MutiInputs.push(_this2._operands[input]);
+                MutiInputs.push(_this3._operands[input]);
               });
-              _this2._operands[layer.outputs[0]] = layer.call(MutiInputs);
+              _this3._operands[layer.outputs[0]] = layer.call(MutiInputs);
             }
             // this._operands[layer.outputs[0]].transferFromGLTexture();
           }
           // console.log(i, (performance.now() - start).toFixed(2), layer);
         });
-        if (!_this2.supportTopClasses && !_this2.supportFeatureMapConcate) {
+        if (!_this3.supportTopClasses && !_this3.supportFeatureMapConcate) {
           // let transferTime = performance.now() - operationStart - operationTime;
           for (var i = 0; i < outputs.size; ++i) {
             outputBuffer = outputs.get(i).buffer;
             outputIndex = outputs.get(i).index;
-            _this2._operands[outputIndex].transferFromGLTexture();
-            outputBuffer.set(_this2._operands[outputIndex].tensor.data);
+            _this3._operands[outputIndex].transferFromGLTexture();
+            outputBuffer.set(_this3._operands[outputIndex].tensor.data);
           }
           // console.log(`Read data from GPU time: ${transferTime.toFixed(2)} ms`)
         }
         if (!isLast) {
-          _this2._operands = [];
+          _this3._operands = [];
         }
         // let operationTime = performance.now() - operationStart;
         // console.log(`WebGL2 execute time: ${operationTime.toFixed(2)} ms`);
@@ -21580,7 +21586,7 @@ var Input = function (_Layer) {
   /**
    * Creates an InputLayer layer
    *
-   * @param {Object} [attrs] - layer attributes
+   * @param {Object} [attrs] - inputsNum: number of inputs
    */
   function Input() {
     var attrs = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -21590,29 +21596,47 @@ var Input = function (_Layer) {
     var _this = _possibleConstructorReturn(this, (Input.__proto__ || Object.getPrototypeOf(Input)).call(this, attrs));
 
     _this.name = 'Input';
-    _this.inputTensor = null;
+    _this.inputsNum = attrs.inputsNum;
+    _this.inputTensors = Array(_this.inputsNum);
     return _this;
   }
 
   /**
    * call
    *
-   * @param {number[]} data
+   * @param {Map} inputs - input map with value: inputBuffers and indexes identifying the input operands.
    */
 
 
   _createClass(Input, [{
     key: 'call',
-    value: function call(data, shape, type) {
-      this.inputTensor = null;
-      this.inputTensor = new _Tensor2.default(data, shape, type);
-      if (this.inputTensor.tensor.shape.length <= 2) {
-        this.inputTensor.createGLTexture({ type: '2d', format: 'float', supportSliceTexture: true });
-      } else if (this.inputTensor.tensor.shape.length > 2) {
-        this.inputTensor.reshapeTo2D();
-        this.inputTensor.createGLTexture({ type: '2d', format: 'float', supportSliceTexture: true });
-      }
-      return this.inputTensor;
+    value: function call(inputs, shape, type) {
+      var _this2 = this;
+
+      inputs.forEach(function (input, i) {
+        if (!_this2.inputTensors[i]) {
+          _this2.inputTensors[i] = new _Tensor2.default(input.buffer, shape, type);
+          if (_this2.inputTensors[i].tensor.shape.length <= 2) {
+            _this2.inputTensors[i].createGLTexture({ type: '2d', format: 'float', supportSliceTexture: true });
+          } else if (_this2.inputTensors[i].tensor.shape.length > 2) {
+            _this2.inputTensors[i].reshapeTo2D();
+            _this2.inputTensors[i].createGLTexture({ type: '2d', format: 'float', supportSliceTexture: true });
+          }
+        } else {
+          if (type !== _this2.inputTensors[i].arrayType) {
+            _this2.throwError('Invalid data type in InputLayer.');
+          }
+          if (shape.reduce(function (a, b) {
+            return a * b;
+          }) !== _this2.inputTensors[i].tensor.shape.reduce(function (a, b) {
+            return a * b;
+          })) {
+            _this2.throwError('Invalid data shape in InputLayer.');
+          }
+          _this2.inputTensors[i].replaceTensorData(input.buffer);
+        }
+      });
+      return this.inputTensors;
     }
   }]);
 
