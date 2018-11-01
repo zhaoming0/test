@@ -43,7 +43,7 @@ var csvSuite = "tests";
         let string = "We do not support " + sys + " as run platform";
         throw new Error(string);
     }
-    
+
 
     var getName = async function(element) {
         let Text = null;
@@ -211,7 +211,7 @@ var csvSuite = "tests";
             "Linux-WebGL2"
         ];
         let backends = [
-            "WebGL2",
+            // "WebGL2",
             "WASM"
         ]
         for (let j of backends) {
@@ -249,7 +249,7 @@ var csvSuite = "tests";
             }
         }
     }
-    await testResult();
+    // await testResult();
     await driver.quit()
 })().then(function() {
     console.log("Grasping test result is completed!");
