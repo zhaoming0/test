@@ -1,4 +1,5 @@
-require("../lib/WMLTP-init.js");
+// require("../lib/WMLTP-init.js");
+process.exit(1);
 const path = require("path");
 const webdriver = require("selenium-webdriver");
 const chrome = require("selenium-webdriver/chrome");
