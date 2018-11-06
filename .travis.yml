@@ -13,11 +13,19 @@ matrix:
             - google-chrome
           packages:
             - google-chrome-stable
+    - os: osx
+      node_js: '8'
+      sudo: 'required'
+      env: XQUARTZ_VERSION=2.7.7
 before_install:
   - |
     if [ "$TRAVIS_OS_NAME" = "osx" ]; then
       brew update > /dev/null
       brew cask install google-chrome
+      curl -L -O https://dl.bintray.com/xquartz/legacy-downloads/SL/XQuartz-${XQUARTZ_VERSION}.dmg
+      hdiutil mount XQuartz-${XQUARTZ_VERSION}.dmg
+      sudo installer -store -pkg /Volumes/XQuartz-${XQUARTZ_VERSION}/XQuartz.pkg -target /
+      hdiutil unmount /Volumes/XQuartz-${XQUARTZ_VERSION}
     fi
 install:
   - npm install
@@ -26,6 +34,9 @@ before_script:
   - |
     if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       sh -e /etc/init.d/xvfb start
+    fi
+    if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+      /opt/X11/bin/xterm&
     fi
 script:
   - npm test
