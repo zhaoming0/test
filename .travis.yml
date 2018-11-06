@@ -20,7 +20,6 @@ matrix:
 before_install:
   - |
     if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-      brew update > /dev/null
       brew cask install google-chrome
       curl -L -O https://dl.bintray.com/xquartz/legacy-downloads/SL/XQuartz-${XQUARTZ_VERSION}.dmg
       hdiutil mount XQuartz-${XQUARTZ_VERSION}.dmg
