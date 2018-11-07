@@ -10,7 +10,7 @@ const builder = new webdriver.Builder();
 builder.forBrowser('chrome');
 builder.setChromeOptions(options);
 const driver = builder.build();
-// const csv = require('./node_modules/fast-csv');
+const csv = require('./node_modules/fast-csv');
 const fs = require('fs');
 const os = require('os');
 
@@ -29,6 +29,35 @@ let csvSuite = 'tests';
 
 (async function() {
   let baselinejson = JSON.parse(fs.readFileSync('./test/tools/CI/baseline/baseline.config.json'));
+  //
+  let baseLineData = new Map();
+  csv.fromPath('baseline/unitTestsBaseline.csv').on('data', function(data) {
+    baseLineData.set(data[0] + '-' + data[1], new Map(
+      [
+        ['Feature', data[0]],
+        ['CaseId', data[1]],
+        ['TestCase', data[2]],
+        ['Mac-MPS', data[3]],
+        ['Mac-BNNS', data[4]],
+        ['Mac-WASM', data[5]],
+        ['Mac-WebGL2', data[6]],
+        ['Android-NNAPI', data[7]],
+        ['Android-WASM', data[8]],
+        ['Android-WebGL2', data[9]],
+        ['Windows-clDNN', data[10]],
+        ['Windows-WASM', data[11]],
+        ['Windows-WebGL2', data[12]],
+        ['Linux-clDNN', data[13]],
+        ['Linux-WASM', data[14]],
+        ['Linux-WebGL2', data[15]]
+      ]
+    ));
+  }).on('end', function() {
+    for (let key of baseLineData.keys()) {
+      console.log("keys: " + key);
+    }
+  });
+  //
   let sys = os.type();
   let platform;
   if (sys == 'Linux') {
