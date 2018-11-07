@@ -11,9 +11,12 @@ jobs:
       - run: node -v
       - run: yarn install
       - run: pwd
-      - run: ls
+      - run: ls node_modules
       - run: npm install
-      - run: ls
+      - run: ls node_modules
+      - run: cat package.json
+      - run: npm run build
+      - run: npm test 
 workflows:
   version: 2
   build-and-deploy:
