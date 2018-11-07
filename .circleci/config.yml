@@ -3,14 +3,18 @@ jobs:
   build:
     working_directory: ~
     docker:
-      - image: circleci/php:7.1-node-browsers
+        - image: circleci/node:4.8.2-browsers
     steps:
       - checkout
       - run: sudo npm install -g npm@latest
       - run: sudo apt install vim
       - run: node -v
+      - run: npm -v
       - run: yarn install
       - run: pwd
+      - run: ls
+      - run: npm install
+      - run: ls
 workflows:
   version: 2
   build-and-deploy:
