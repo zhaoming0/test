@@ -9,6 +9,8 @@ jobs:
       - run: sudo npm install -g npm@latest
       - run: sudo apt install vim
       - run: node -v
+      - run: cat /etc/issue
+      - run: uname -a
       - run: yarn install
       - run: pwd
       - run: ls node_modules
