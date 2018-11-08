@@ -29,35 +29,36 @@ let csvSuite = 'tests';
 
 (async function() {
   let baselinejson = JSON.parse(fs.readFileSync('./test/tools/CI/baseline/baseline.config.json'));
-  //
-  let baseLineData = new Map();
-  csv.fromPath('baseline/unitTestsBaseline.csv').on('data', function(data) {
-    baseLineData.set(data[0] + '-' + data[1], new Map(
-      [
-        ['Feature', data[0]],
-        ['CaseId', data[1]],
-        ['TestCase', data[2]],
-        ['Mac-MPS', data[3]],
-        ['Mac-BNNS', data[4]],
-        ['Mac-WASM', data[5]],
-        ['Mac-WebGL2', data[6]],
-        ['Android-NNAPI', data[7]],
-        ['Android-WASM', data[8]],
-        ['Android-WebGL2', data[9]],
-        ['Windows-clDNN', data[10]],
-        ['Windows-WASM', data[11]],
-        ['Windows-WebGL2', data[12]],
-        ['Linux-clDNN', data[13]],
-        ['Linux-WASM', data[14]],
-        ['Linux-WebGL2', data[15]]
-      ]
-    ));
-  }).on('end', function() {
-    for (let key of baseLineData.keys()) {
-      console.log("keys: " + key);
-    }
-  });
-  //
+// //
+//   let baseLineData = new Map();
+//   csv.fromPath('baseline/unitTestsBaseline.csv').on('data', function(data) {
+//     baseLineData.set(data[0] + ' - ' + data[1] + ' - ' + data[2] + ' - ' + data[9], new Map(
+//       [
+//         ['Feature', data[0]],
+//         ['CaseId', data[1]],
+//         ['TestCase', data[2]],
+//         ['Mac-MPS', data[3]],
+//         ['Mac-BNNS', data[4]],
+//         ['Mac-WASM', data[5]],
+//         ['Mac-WebGL2', data[6]],
+//         ['Android-NNAPI', data[7]],
+//         ['Android-WASM', data[8]],
+//         ['Android-WebGL2', data[9]],
+//         ['Windows-clDNN', data[10]],
+//         ['Windows-WASM', data[11]],
+//         ['Windows-WebGL2', data[12]],
+//         ['Linux-clDNN', data[13]],
+//         ['Linux-WASM', data[14]],
+//         ['Linux-WebGL2', data[15]]
+//       ]
+//     ));
+//   }).on('end', function() {
+//     console.log(baseLineData.get('CTS'))
+//     for (let key of baseLineData.keys()) {
+//       // console.log('keys:  ' + key);
+//     }
+//   });
+//   //
   let sys = os.type();
   let platform;
   if (sys == 'Linux') {
@@ -104,7 +105,59 @@ let csvSuite = 'tests';
   //   let Text = await element.findElement(By.xpath('./pre[last()]')).getText();
   //   return Text;
   // };
-
+  let backendModel;
+  let baseLineData = new Map();
+  let lists = [
+    'Feature',
+    'Case Id',
+    'Test Case',
+    'Mac-WASM',
+    'Mac-WebGL2',
+    'Android-WASM',
+    'Android-WebGL2',
+    'Windows-WASM',
+    'Windows-WebGL2',
+    'Linux-WASM',
+    'Linux-WebGL2'
+  ]
+  let checkStatus = async function (backendModel, results) {
+    // console.log("this line 123 \n\n")
+    for (let i=0; i< lists.length; i++) {
+      if (lists[i] == backendModel) {
+        // console.log(i)
+        // console.log(backendModel)
+        csv.fromPath('baseline/unitTestsBaseline.csv').on('data', function(data) {
+          baseLineData.set(data[0] + data[1] + data[2] +  data[i]);
+        }).on('end', function() {
+            console.log(baseLineData.has('Unit Test/Base Test-Unit Test/Base Test/1-check namespace-Pass'));
+            console.log('this is line 132')
+            console.log(baseLineData.has(results['Feature'] + results['CaseId'] + results['TestCase'] + 'Pass'))
+            console.log(results['Feature'] + results['CaseId'] + results['TestCase'] + 'Pass')
+            console.log("\n")
+            console.log("this is line 137")
+            
+          if (results['Pass'] == 'null') {
+            console.log('this is line 133')
+            if (baseLineData.has(results['Feature'], results['CaseId'], results['TestCase'], results['Fail'])) {
+              console.log("this is line 24")
+            } else if (baseLineData.has(results['Feature'], results['CaseId'], results['TestCase'], results['NA'])) {
+              console.log("this is line 26")
+            }
+          } else {
+            // console.log(baseLineData)
+            // process.exit(1)
+            if (baseLineData.has(results['Feature'], results['CaseId'], results['TestCase'], results['Fail'])) {
+              console.log("this is line 30")
+            } else if (baseLineData.has(results['Feature'], results['CaseId'], results['TestCase'], results['Pass'])) {
+              console.log("this is line 32")
+            }
+          }
+        });
+      }
+    }
+  
+  }
+  
   let getInfo = async function(element) {
     let array = await element.findElements(By.xpath('./ul/li[@class="test pass fast" or @class="test pass slow" or @class="test fail" or @class="test pass pending" or @class="test pass medium"]'));
 
@@ -147,16 +200,19 @@ let csvSuite = 'tests';
         csvModule = csvTitle;
       }
 
-      // let DataFormat = {
-      //   Feature: csvTitle,
-      //   CaseId: csvModule + '/' + i,
-      //   TestCase: csvName,
-      //   Pass : csvPass,
-      //   Fail: csvFail,
-      //   NA: csvNA,
-      //   ExecutionType: csvExecution,
-      //   SuiteName: csvSuite
-      // };
+      let DataFormat = {
+        Feature: csvTitle,
+        CaseId: csvModule + '/' + i,
+        TestCase: csvName,
+        Pass : csvPass,
+        Fail: csvFail,
+        NA: csvNA,
+        ExecutionType: csvExecution,
+        SuiteName: csvSuite
+      };
+      //console.log(DataFormat);
+      //console.log(backendModel)
+      await checkStatus(backendModel, DataFormat);
       csvName = null;
       csvPass = null;
       csvFail = null;
@@ -248,6 +304,7 @@ let csvSuite = 'tests';
       let totalResult;
       for (let i of backendModels) {
         if ((i.indexOf(platform) != -1) && (i.indexOf(j) != -1)) {
+          backendModel = i;
           console.log('Begin test with : ' + i + ' backend.');
           totalResult = baselinejson[i];
           // let testlink = path.join('file:\/\/', __dirname, 'test', 'cts.html?backend=');
@@ -258,6 +315,11 @@ let csvSuite = 'tests';
             await driver.sleep(10000);
             let time_end = await driver.findElement(By.xpath('//ul[@id="mocha-stats"]/li[@class="duration"]//em')).getText();
             if (time_begin === time_end) {
+              let passResult = await driver.findElement(By.xpath('//*[@id="mocha-stats"]/li[2]/em')).getText();
+              if (totalResult.pass > passResult) {
+                let str = 'Expect pass is :' + totalResult.pass + ' and actual result is : ' + passResult + ' will exit process !';
+                throw new Error(str);
+              }
               break;
             };
           }
