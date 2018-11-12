@@ -24,41 +24,9 @@ let csvName = null;
 let csvPass = null;
 let csvFail = null;
 let csvNA = null;
-let csvExecution = 'auto';
-let csvSuite = 'tests';
 
 (async function() {
   let baselinejson = JSON.parse(fs.readFileSync('./test/tools/CI/baseline/baseline.config.json'));
-// //
-//   let baseLineData = new Map();
-//   csv.fromPath('baseline/unitTestsBaseline.csv').on('data', function(data) {
-//     baseLineData.set(data[0] + ' - ' + data[1] + ' - ' + data[2] + ' - ' + data[9], new Map(
-//       [
-//         ['Feature', data[0]],
-//         ['CaseId', data[1]],
-//         ['TestCase', data[2]],
-//         ['Mac-MPS', data[3]],
-//         ['Mac-BNNS', data[4]],
-//         ['Mac-WASM', data[5]],
-//         ['Mac-WebGL2', data[6]],
-//         ['Android-NNAPI', data[7]],
-//         ['Android-WASM', data[8]],
-//         ['Android-WebGL2', data[9]],
-//         ['Windows-clDNN', data[10]],
-//         ['Windows-WASM', data[11]],
-//         ['Windows-WebGL2', data[12]],
-//         ['Linux-clDNN', data[13]],
-//         ['Linux-WASM', data[14]],
-//         ['Linux-WebGL2', data[15]]
-//       ]
-//     ));
-//   }).on('end', function() {
-//     console.log(baseLineData.get('CTS'))
-//     for (let key of baseLineData.keys()) {
-//       // console.log('keys:  ' + key);
-//     }
-//   });
-//   //
   let sys = os.type();
   let platform;
   if (sys == 'Linux') {
@@ -121,31 +89,15 @@ let csvSuite = 'tests';
     'Linux-WebGL2'
   ]
   let checkStatus = async function (backendModel, results) {
-    // console.log("this line 123 \n\n")
     for (let i=0; i< lists.length; i++) {
       if (lists[i] == backendModel) {
-        console.log(i)
-        console.log(backendModel)
         csv.fromPath('baseline/unitTestsBaseline.csv').on('data', function(data) {
-          baseLineData.set(data[0] + data[1] + data[2] +  data[i]);
-          // console.log("aaaa------aaaaa     "+data[0] + data[1] + data[2] +  data[i])
+          baseLineData.set(data[0] + data[2] +  data[i]);
         }).on('end', function() {
-          if (results['Pass'] != 1) {
-            // console.log(results['Feature'] + results['CaseId'] + results['TestCase'] + 'Pass')
-            // console.log(baseLineData.has(results['Feature'] + results['CaseId'] + results['TestCase'] + 'Pass'))
-            // console.log("+++++++++++++++++++++++++++++=")
-            // console.log(results['Feature'] + results['CaseId'] + results['TestCase'] + 'Fail')
-            // console.log(baseLineData.has(results['Feature'] + results['CaseId'] + results['TestCase'] + 'Fail'))
-            // console.log(baseLineData)
-            console.log('CTS Supplement TestCTS Supplement Test/6check result for Fully connected float 3D input examplePass')
-            console.log(results['Feature'] + results['CaseId'] + results['TestCase'] + 'Pass');
-            console.log("\n")
-            if (baseLineData.has(results['Feature'] + results['CaseId'] + results['TestCase'] + 'Pass')) {
-              console.log("********************************************-------------------------------------------------******************************************************")
-              let str = 'Feature : ' + results['Feature'] + ' CaseId : ' + results['CaseId'] + ' TestCase : ' + results['TestCase'] + ' \n Result not Match baseline .';
-              throw new Error(str);
+          if (results['Pass'] != 1 && baseLineData.has(results['Feature']  + results['TestCase'] + 'Pass')) {
+              let str = 'Feature : ' + results['Feature'] + ' TestCase : ' + results['TestCase'];
+              failCaseList.push(str);
             }
-          }
         });
       }
     }
@@ -202,50 +154,13 @@ let csvSuite = 'tests';
         Pass : csvPass,
         Fail: csvFail,
         NA: csvNA,
-        ExecutionType: csvExecution,
-        SuiteName: csvSuite
       };
-      //console.log(DataFormat);
-      //console.log(backendModel)
       await checkStatus(backendModel, DataFormat);
       csvName = null;
       csvPass = null;
       csvFail = null;
       csvNA = null;
     }
-  };
-
-  let check = async function() {
-    await driver.findElement(By.xpath('//ul[@id="mocha-stats"]/li[@class="passes"]//em')).getText()
-      .then(function(message) {
-        let getPasses = message;
-        // console.log('    Web passes: ' + getPasses);
-        // console.log('  Check passes: ' + countPasses);
-
-        if (getPasses != countPasses) {
-          throw new Error('It\'s wrong to passed result!');
-        }
-      });
-
-    await driver.findElement(By.xpath('//ul[@id="mocha-stats"]/li[@class="failures"]//em')).getText()
-      .then(function(message) {
-        let getFailures = message;
-        // console.log('  Web failures: ' + getFailures);
-        // console.log('Check failures: ' + countFailures);
-
-        if (getFailures != countFailures) {
-          throw new Error('It\'s wrong to failed result!');
-        }
-      });
-
-    // console.log('       Pending: ' + countPending);
-    // console.log('         TOTAL: ' + (countPasses + countFailures + countPending));
-
-    await driver.findElement(By.xpath('//ul[@id="mocha-stats"]/li[@class="duration"]//em')).getText()
-      .then(function(message) {
-        let Duration = message;
-        // console.log('      Duration: ' + Duration + ' ms');
-      });
   };
 
   let grasp = async function() {
@@ -268,7 +183,6 @@ let csvSuite = 'tests';
       }
       await getInfo(arrayTitles[i - 1]);
     }
-    await check();
   };
 
   let testResult = async function() {
@@ -316,10 +230,10 @@ let csvSuite = 'tests';
                 let str = 'Expect pass is :' + totalResult.pass + ' and actual result is : ' + passResult + ' will exit process !';
                 throw new Error(str);
               }
-              // if (totalResult.fail < failResult) {
-              //   let str = 'Expect fail is :' + totalResult.fail + ' and actual result is : ' + failResult + ' will exit process !';
-              //   throw new Error(str);
-              // }
+              if (totalResult.fail < failResult) {
+                let str = 'Expect fail is :' + totalResult.fail + ' and actual result is : ' + failResult + ' will exit process !';
+                throw new Error(str);
+              }
               break;
             };
           }
@@ -329,21 +243,29 @@ let csvSuite = 'tests';
           await grasp();
         }
       }
-      if (totalResult.pass !== countPasses) {
-        let str = 'Expect pass is : ' + totalResult.pass + ' and actual result is : ' + countPasses + ' not equal will exit !';
-        // throw new Error(str);
-      } else if (totalResult.fail !== countFailures) {
-        let str = 'Expect fail is : ' + totalResult.fail + ' and actual result is : ' + countFailures + ' not equal will exit !';
-        // throw new Error(str);
-      } else if (totalResult.block !== countPending) {
-        let str = 'Expect block is : ' + totalResult.block + ' and actual result is : ' + countPending + ' not equal will exit !';
-        // throw new Error(str);
-      } else {
-        let str = 'Result match with baseline, test pass. ' + '\n Pass : ' + countPasses + '\n Fail : ' + countFailures + '\n Block : ' + countPending;
-        console.log(str);
+      // if (totalResult.pass !== countPasses) {
+      //   let str = 'Expect pass is : ' + totalResult.pass + ' and actual result is : ' + countPasses + ' not equal will exit !';
+      //   // throw new Error(str);
+      // } else if (totalResult.fail !== countFailures) {
+      //   let str = 'Expect fail is : ' + totalResult.fail + ' and actual result is : ' + countFailures + ' not equal will exit !';
+      //   // throw new Error(str);
+      // } else if (totalResult.block !== countPending) {
+      //   let str = 'Expect block is : ' + totalResult.block + ' and actual result is : ' + countPending + ' not equal will exit !';
+      //   // throw new Error(str);
+      // } else {
+      //   let str = 'Result match with baseline, test pass. ' + '\n Pass : ' + countPasses + '\n Fail : ' + countFailures + '\n Block : ' + countPending;
+      //   console.log(str);
+      // }
+    }
+    if (failCaseList.length > 0) {
+      console.log('Test fail, below case get different result with expect data : ')
+      for (let i = 0; i< failCaseList.length; i++ ) {
+        console.log(failCaseList[i])
       }
+      throw new Error("Test Fail");
     }
   };
+  let failCaseList = [];
   await testResult();
   await driver.quit();
 })().then(function() {
