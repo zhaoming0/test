@@ -95,7 +95,7 @@ let csvNA = null;
           baseLineData.set(data[0] + data[2] +  data[i]);
         }).on('end', function() {
           if (results['Pass'] != 1 && baseLineData.has(results['Feature']  + results['TestCase'] + 'Pass')) {
-              let str = 'Feature : ' + results['Feature'] + ' TestCase : ' + results['TestCase'];
+              let str = 'Feature: ' + results['Feature'] + ', TestCase: ' + results['TestCase'];
               failCaseList.push(str);
             }
         });
@@ -262,6 +262,7 @@ let csvNA = null;
       for (let i = 0; i< failCaseList.length; i++ ) {
         console.log(failCaseList[i])
       }
+      await driver.quit();
       throw new Error("Test Fail");
     }
   };
