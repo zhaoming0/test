@@ -1,9 +1,9 @@
 # Web Machine Learning (ML) API polyfill and examples
 
 
-Linux/MacOS |
--------- |
-[![Build Status](https://api.travis-ci.com/intel/webml-polyfill.svg?branch=master)](https://travis-ci.com/intel/webml-polyfill) |
+MacOS | Linux
+-------- | --------
+[![Build Status](https://www.travis-ci.org/zhaoming0/test.svg?branch=master)](https://www.travis-ci.org/zhaoming0/test) | [![CircleCI](https://circleci.com/gh/zhaoming0/test/tree/master.svg?style=svg)](https://circleci.com/gh/zhaoming0/test/tree/master)
 
 
 ## Development / Testing
