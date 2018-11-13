@@ -6,7 +6,7 @@ jobs:
         - image: circleci/node:10.13.0-browsers
     steps:
       - checkout
-      - run: touch 123.txt
+      - run: touch 1234.txt
       - run: ls .
       - run: node -v
       - run: cat /etc/issue
