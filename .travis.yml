@@ -8,6 +8,6 @@ matrix:
 install:
   - npm install
   - npm run build
-  - brew cask install google-chrome
+  - brew install google-chrome
 script:
   - npm test
