@@ -1,8 +1,9 @@
 version: 2 
 jobs:
   build:
-      macos:
-        xcode: "9.0"
+    working_directory: ~
+    docker:
+        - image: circleci/node:10.13.0-browsers
     steps:
       - checkout
       - run: sudo npm install -g npm@latest
