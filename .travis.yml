@@ -13,10 +13,10 @@ matrix:
             - google-chrome
           packages:
             - google-chrome-stable
-    - os: osx
-      node_js: '8'
-      sudo: 'required'
-      env: XQUARTZ_VERSION=2.7.7
+              #- os: osx
+              #node_js: '8'
+              #sudo: 'required'
+              #env: XQUARTZ_VERSION=2.7.7
 before_install:
   - |
     if [ "$TRAVIS_OS_NAME" = "osx" ]; then
