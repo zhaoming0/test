@@ -203,8 +203,8 @@ let csvNA = null;
       'Linux-WebGL2',
     ];
     let backends = [
-      'WASM',
-      // 'WebGL2'
+      // 'WASM',
+      'WebGL2'
     ];
     await driver.get('chrome://gpu');
     let vr = await driver.findElement(By.xpath('//*[@id="info-view-table"]/tbody/tr[2]/td[2]/span')).getText();
