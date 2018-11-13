@@ -1,4 +1,3 @@
-// process.exit(0);
 const path = require('path');
 const webdriver = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
