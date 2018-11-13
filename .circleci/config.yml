@@ -10,7 +10,6 @@ jobs:
       - run: cat /etc/issue
       - run: uname -a
       - run: pwd
-      - run: ls node_modules
       - run: npm install
       - run: ls node_modules
       - run: cat package.json
