@@ -8,6 +8,5 @@ matrix:
 install:
   - npm install
   - npm run build
-  - brew upgrade google-chrome
 script:
   - npm test
