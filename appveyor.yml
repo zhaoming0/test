@@ -1,0 +1,10 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+build: off
+test_script:
+- sh: >-
+    npm install
+
+    npm run build
+
+    npm test
