@@ -2,8 +2,6 @@ version: "{build}"
 clone_depth: 5
 
 install:
-    - node --version
-    - npm --version
     - npm install
     - npm run build
 test_script:
