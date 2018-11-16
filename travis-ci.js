@@ -1,5 +1,5 @@
 console.log("this is travis ci script . test case will be launch------------------------------------------------------")
-process.exit(0);
+// process.exit(0);
 const path = require('path');
 const webdriver = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
