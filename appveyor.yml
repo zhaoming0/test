@@ -1,9 +1,11 @@
+version: "{build}"
 clone_depth: 5
 
 install:
-    - ps: Install-Product node 6.9 # 默认node版本太老
     - node --version
     - npm --version
     - npm install
     - npm run build
+test_script:
     - npm test
+build: off
