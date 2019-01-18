@@ -1,5 +1,5 @@
 class PoseNet{
-  constructor(modelArch, version, outputStride, inputShape, type, cacheMap, backend) {
+  constructor(modelArch, version, outputStride, inputShape, type, cacheMap, backend, prefer) {
     this._modelArch = modelArch;
     this._model = null;
     this._compilation;
@@ -14,36 +14,31 @@ class PoseNet{
     this._inputTensorId;
     this._outputTensorId;
     this._cacheMap = cacheMap;
-    if (typeof backend !== 'undefined') {
-      this._backend = backend;
-    } else {
-      if (nnNative && getPreferParam() !== 'invalid') {
-        this._backend = 'WebML';
-      } else {
-        this._backend = 'WASM';
-      }
-    }
+    this._backend = backend;
+    this._prefer = prefer;
     if (this._backend === 'WebML') {
       if (nnNative === null) {
         throw Error('Fails to initialize neural network context');
       }
       this._nn = nnNative;
-    } else if (this._backend === 'WASM' || this._backend === 'WebGL2') {
+    } else if (this._backend === 'WASM' || this._backend === 'WebGL') {
       this._nn = nnPolyfill;
     }
   }
   async createCompiledModel() {
     let options = {};
-    if (this._backend === 'WebGL2') {
-      options.useWebGL2 = true;
-    }
+    options.backend = this._backend;
     this._model = await this._nn.createModel(options);
     await this._addTensorOperands();
     await this._model.finish();
     this._compilation = await this._model.createCompilation();
-    this._compilation.setPreference(getPrefer(this._backend));
+
+    let start = performance.now();
+    this._compilation.setPreference(getPreferCode(this._backend, this._prefer));
     await this._compilation.finish();
     this._execution = await this._compilation.createExecution();
+    let elapsed = performance.now() - start;
+    console.log(`compilation time: ${elapsed.toFixed(2)} ms`);
   }
 
   async computeSinglePose(inputTensor, heatmapTensor, offsetTensor) {

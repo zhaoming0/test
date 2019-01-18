@@ -1,60 +1,46 @@
-1. `./resources/data` file which come from `test_data_set_1/input_0.pb` of [Squeezenet](https://s3.amazonaws.com/onnx-model-zoo/squeezenet/squeezenet1.1/squeezenet1.1.tar.gz) file.
-2. Those weight and bias files which come from `squeezenet1.1.onnx` of [Squeezenet](https://s3.amazonaws.com/onnx-model-zoo/squeezenet/squeezenet1.1/squeezenet1.1.tar.gz) file.
+# Web Machine Learning (ML) API polyfill and examples
 
-`
-./resources/squeezenet0_conv0_weight 
-./resources/squeezenet0_conv1_weight 
-./resources/squeezenet0_conv2_weight 
-./resources/squeezenet0_conv3_weight 
-./resources/squeezenet0_conv4_weight 
-./resources/squeezenet0_conv5_weight 
-./resources/squeezenet0_conv6_weight 
-./resources/squeezenet0_conv7_weight 
-./resources/squeezenet0_conv8_weight 
-./resources/squeezenet0_conv9_weight 
-./resources/squeezenet0_conv10_weight 
-./resources/squeezenet0_conv11_weight 
-./resources/squeezenet0_conv12_weight 
-./resources/squeezenet0_conv13_weight 
-./resources/squeezenet0_conv14_weight 
-./resources/squeezenet0_conv15_weight 
-./resources/squeezenet0_conv16_weight 
-./resources/squeezenet0_conv17_weight 
-./resources/squeezenet0_conv18_weight 
-./resources/squeezenet0_conv19_weight 
-./resources/squeezenet0_conv20_weight 
-./resources/squeezenet0_conv21_weight 
-./resources/squeezenet0_conv22_weight 
-./resources/squeezenet0_conv23_weight 
-./resources/squeezenet0_conv24_weight 
-./resources/squeezenet0_conv25_weight 
-`
 
-`
-./resources/squeezenet0_conv0_bias
-./resources/squeezenet0_conv1_bias
-./resources/squeezenet0_conv2_bias
-./resources/squeezenet0_conv3_bias
-./resources/squeezenet0_conv4_bias
-./resources/squeezenet0_conv5_bias
-./resources/squeezenet0_conv6_bias
-./resources/squeezenet0_conv7_bias
-./resources/squeezenet0_conv8_bias
-./resources/squeezenet0_conv9_bias
-./resources/squeezenet0_conv10_bias
-./resources/squeezenet0_conv11_bias
-./resources/squeezenet0_conv12_bias
-./resources/squeezenet0_conv13_bias
-./resources/squeezenet0_conv14_bias
-./resources/squeezenet0_conv15_bias
-./resources/squeezenet0_conv16_bias
-./resources/squeezenet0_conv17_bias
-./resources/squeezenet0_conv18_bias
-./resources/squeezenet0_conv19_bias
-./resources/squeezenet0_conv20_bias
-./resources/squeezenet0_conv21_bias
-./resources/squeezenet0_conv22_bias
-./resources/squeezenet0_conv23_bias
-./resources/squeezenet0_conv24_bias
-./resources/squeezenet0_conv25_bias
-`
+MacOS | Linux
+-------- | --------
+[![Build Status](https://www.travis-ci.org/zhaoming0/test.svg?branch=master)](https://www.travis-ci.org/zhaoming0/test) | [![CircleCI](https://circleci.com/gh/zhaoming0/test/tree/master.svg?style=svg)](https://circleci.com/gh/zhaoming0/test/tree/master)
+
+
+## Development / Testing
+
+### Install
+
+```sh
+$ npm install
+```
+
+### Build
+
+```sh
+$ npm run build
+```
+
+Production build:
+
+```sh
+$ NODE_ENV=production npm run build
+```
+
+### Test
+
+```sh
+$ npm start
+```
+
+Open browser and navigate to http://localhost:8080/test
+
+### Watch
+
+```sh
+$ npm run watch
+```
+
+# License
+This project is following [Apache License Version 2.0](./LICENSE_APACHE2).
+
+And all documents in [test/wpt/resources](./test/wpt/resources) are licensed by the [W3C 3-clause BSD License](./test/wpt/resources/LICENSE).
