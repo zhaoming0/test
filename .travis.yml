@@ -15,7 +15,7 @@ install:
 script:
   - export COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
   - export AUTHOR_NAME="$(git log -1 $TRAVIS_COMMIT --pretty="%aN")"
-  - git log -1 $TRAVIS_COMMIT --pretty="%aN"
   - if (COMMITTER_EMAIL.match("intel")) {
   - git log -1 $TRAVIS_COMMIT --pretty="%cE"
+  - git log -1
   - }
