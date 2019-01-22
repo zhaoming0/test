@@ -1,9 +1,9 @@
 # Web Machine Learning (ML) API polyfill and examples
 
 
-MacOS | Linux
--------- | --------
-[![Build Status](https://www.travis-ci.org/zhaoming0/test.svg?branch=master)](https://www.travis-ci.org/zhaoming0/test) | [![CircleCI](https://circleci.com/gh/zhaoming0/test/tree/master.svg?style=svg)](https://circleci.com/gh/zhaoming0/test/tree/master)
+MacOS | Linux | Windows
+-------- | -------- | --------
+[![Build Status](https://api.travis-ci.com/intel/webml-polyfill.svg?branch=master)](https://travis-ci.com/intel/webml-polyfill) | [![CircleCI](https://circleci.com/gh/intel/webml-polyfill/tree/master.svg?style=svg)](https://circleci.com/gh/intel/webml-polyfill/tree/master) | [![Build status](https://ci.appveyor.com/api/projects/status/6xjudmjja1mcyo1m/branch/master?svg=true)](https://ci.appveyor.com/project/ibelem/webml-polyfill-egsl9/branch/master)
 
 
 ## Development / Testing
@@ -12,6 +12,17 @@ MacOS | Linux
 
 ```sh
 $ npm install
+```
+
+### Start
+
+```sh
+$ npm start
+```
+
+Start an HTTPS server:
+```sh
+$ HTTPS=true npm start
 ```
 
 ### Build
@@ -24,6 +35,12 @@ Production build:
 
 ```sh
 $ NODE_ENV=production npm run build
+```
+
+WASM backend build:
+
+```sh
+$ npm run build-wasm
 ```
 
 ### Test
